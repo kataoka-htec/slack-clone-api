@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+﻿import { Router, Request, Response } from 'express';
 import datasource from '../../datasource';
 import { Message } from './message.entity';
 import { Auth } from '../../lib/auth';
@@ -10,7 +10,7 @@ const messageController = Router();
 const messageRepository = datasource.getRepository(Message);
 const channelRepository = datasource.getRepository(Channel);
 
-// チャンネル内のすべてのメッセージを取得
+// 繝√Ε繝ｳ繝阪Ν蜀・・縺吶∋縺ｦ縺ｮ繝｡繝・そ繝ｼ繧ｸ繧貞叙蠕・
 messageController.get(
   '/:workspaceId/:channelId',
   Auth,
@@ -26,13 +26,13 @@ messageController.get(
 
       res.status(200).json(messages);
     } catch (error) {
-      console.error('メッセージ取得エラー:', error);
-      res.status(500).json({ message: 'サーバーエラーが発生しました' });
+      console.error('繝｡繝・そ繝ｼ繧ｸ蜿門ｾ励お繝ｩ繝ｼ:', error);
+      res.status(500).json({ message: '繧ｵ繝ｼ繝舌・繧ｨ繝ｩ繝ｼ縺檎匱逕溘＠縺ｾ縺励◆' });
     }
   }
 );
 
-// メッセージを作成
+// 繝｡繝・そ繝ｼ繧ｸ繧剃ｽ懈・
 messageController.post(
   '/:workspaceId/:channelId',
   Auth,
@@ -51,12 +51,12 @@ messageController.post(
       });
 
       if (existingChannel == null) {
-        res.status(404).json({ message: 'チャンネルが見つかりません' });
+        res.status(404).json({ message: '繝√Ε繝ｳ繝阪Ν縺瑚ｦ九▽縺九ｊ縺ｾ縺帙ｓ' });
         return;
       }
 
       if (!content) {
-        res.status(400).json({ message: 'メッセージ内容は必須です' });
+        res.status(400).json({ message: 'Message content is required' });
         return;
       }
 
@@ -71,18 +71,18 @@ messageController.post(
         relations: ['user'],
       });
 
-      // Socket.IOを使用してリアルタイムで新しいメッセージを全体に配信
-      io.emit('new-message', newMessage);
+      // Socket.IO繧剃ｽｿ逕ｨ縺励※繝ｪ繧｢繝ｫ繧ｿ繧､繝縺ｧ譁ｰ縺励＞繝｡繝・そ繝ｼ繧ｸ繧貞・菴薙↓驟堺ｿ｡
+      io.to(workspaceId).emit('new-message', newMessage);
 
       res.status(201).json(newMessage);
     } catch (error) {
-      console.error('メッセージ作成エラー:', error);
-      res.status(500).json({ message: 'サーバーエラーが発生しました' });
+      console.error('繝｡繝・そ繝ｼ繧ｸ菴懈・繧ｨ繝ｩ繝ｼ:', error);
+      res.status(500).json({ message: '繧ｵ繝ｼ繝舌・繧ｨ繝ｩ繝ｼ縺檎匱逕溘＠縺ｾ縺励◆' });
     }
   }
 );
 
-// 画像アップロードエンドポイント
+// 逕ｻ蜒上い繝・・繝ｭ繝ｼ繝峨お繝ｳ繝峨・繧､繝ｳ繝・
 messageController.post(
   '/:workspaceId/:channelId/image',
   Auth,
@@ -100,12 +100,12 @@ messageController.post(
       });
 
       if (existingChannel == null) {
-        res.status(404).json({ message: 'チャンネルが見つかりません' });
+        res.status(404).json({ message: '繝√Ε繝ｳ繝阪Ν縺瑚ｦ九▽縺九ｊ縺ｾ縺帙ｓ' });
         return;
       }
       const { fileUrl } = await upload(req, res, 'messages');
       if (fileUrl == null) {
-        res.status(400).json({ message: '画像がアップロードされていません' });
+        res.status(400).json({ message: '逕ｻ蜒上′繧｢繝・・繝ｭ繝ｼ繝峨＆繧後※縺・∪縺帙ｓ' });
         return;
       }
       const message = await messageRepository.save({
@@ -116,18 +116,18 @@ messageController.post(
 
       const messageWithUser = { ...message, user: req.currentUser };
 
-      // Socket.IOを使用してリアルタイムで新しい画像メッセージを全体に配信
-      io.emit('new-message', messageWithUser);
+      // Socket.IO繧剃ｽｿ逕ｨ縺励※繝ｪ繧｢繝ｫ繧ｿ繧､繝縺ｧ譁ｰ縺励＞逕ｻ蜒上Γ繝・そ繝ｼ繧ｸ繧貞・菴薙↓驟堺ｿ｡
+      io.to(workspaceId).emit('new-message', messageWithUser);
 
       res.status(201).json(messageWithUser);
     } catch (error) {
-      console.error('画像アップロードエラー:', error);
-      res.status(500).json({ message: 'サーバーエラーが発生しました' });
+      console.error('逕ｻ蜒上い繝・・繝ｭ繝ｼ繝峨お繝ｩ繝ｼ:', error);
+      res.status(500).json({ message: '繧ｵ繝ｼ繝舌・繧ｨ繝ｩ繝ｼ縺檎匱逕溘＠縺ｾ縺励◆' });
     }
   }
 );
 
-// メッセージを削除
+// 繝｡繝・そ繝ｼ繧ｸ繧貞炎髯､
 messageController.delete('/:id', Auth, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -138,20 +138,23 @@ messageController.delete('/:id', Auth, async (req: Request, res: Response) => {
     });
 
     if (!existingMessage) {
-      res.status(404).json({ message: 'メッセージが見つかりません' });
+      res.status(404).json({ message: '繝｡繝・そ繝ｼ繧ｸ縺瑚ｦ九▽縺九ｊ縺ｾ縺帙ｓ' });
       return;
     }
 
     await messageRepository.delete(id);
 
-    // Socket.IOを使用してリアルタイムでメッセージ削除を全体に配信
-    io.emit('delete-message', id);
+    // Socket.IO繧剃ｽｿ逕ｨ縺励※繝ｪ繧｢繝ｫ繧ｿ繧､繝縺ｧ繝｡繝・そ繝ｼ繧ｸ蜑企勁繧貞・菴薙↓驟堺ｿ｡
+    io.to(existingMessage.channel.workspaceId).emit('delete-message', id);
 
     res.status(200).json({ status: true });
   } catch (error) {
-    console.error('メッセージ削除エラー:', error);
-    res.status(500).json({ message: 'サーバーエラーが発生しました' });
+    console.error('繝｡繝・そ繝ｼ繧ｸ蜑企勁繧ｨ繝ｩ繝ｼ:', error);
+    res.status(500).json({ message: '繧ｵ繝ｼ繝舌・繧ｨ繝ｩ繝ｼ縺檎匱逕溘＠縺ｾ縺励◆' });
   }
 });
 
 export default messageController;
+
+
+
